@@ -1,7 +1,9 @@
 import os
 import sys
 import socket
+import time
 
+savePath = ""
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -37,29 +39,37 @@ def manualOs():
         print("You will have to manually set up the server from here. Your os is not supported")
 def download():
     # Get the save path from the user
-   savePath = input("Where do you want to save your minecraft folder? \nPress enter to save into the current directory or type desktop to save it to your desktop\n")
-   if savePath == "desktop":
-       savePath = "~/Desktop"
-   savePath = os.path.expanduser(savePath)
-   if savePath == '':
+    while True:
+        selection = int(input("Where do you want to save the minecraft server?\n1) Desktop\n2) Current directory\n3) Somewhere else\n[1/2/3] "))
+        if selection == 1:
+            savePath = '~/Desktop'
+        elif selection == 2:
+            savePath = os.getcwd()
+        elif selection == 3:
+            savePath = input("Where do you want to save your minecraft server? (your user will need write access to that path)\n")
+        else:
+            break
+        break
+    savePath = os.path.expanduser(savePath)
+    if savePath == '':
        savePath = '.'
 
-   response = requests.get("https://api.papermc.io/v2/projects/paper/versions/" + verson + "/builds/" + str(latestBuild) + "/downloads/paper-" + verson + "-" + str(latestBuild) + ".jar")
-   if response.status_code == 200:
-       if os.path.exists(savePath + "/Server"):
-           print("The server will be saved in " + savePath + "/Server")
-       else:
-           if not os.path.exists(savePath):
-            os.makedirs(savePath)
-           os.makedirs(savePath + "/Server")
-           print("The directory was created successfully and the server will be saved in " + savePath + "/Server")
-           os.chdir(savePath + "/Server/")
-       with open("server.jar", "wb") as f:
-        f.write(response.content)
-        print("Minecraft server files downloaded!")
-        setup()
-   else:
-       print("ERROR: ", response.status_code)
+    response = requests.get("https://api.papermc.io/v2/projects/paper/versions/" + verson + "/builds/" + str(latestBuild) + "/downloads/paper-" + verson + "-" + str(latestBuild) + ".jar")
+    if response.status_code == 200:
+        if os.path.exists(savePath + "/Server"):
+            print("The server will be saved in " + savePath + "/Server")
+        else:
+            if not os.path.exists(savePath):
+             os.makedirs(savePath)
+            os.makedirs(savePath + "/Server")
+            print("The directory was created successfully and the server will be saved in " + savePath + "/Server")
+            os.chdir(savePath + "/Server/")
+        with open("server.jar", "wb") as f:
+         f.write(response.content)
+         print("Minecraft server files downloaded!")
+         setup()
+    else:
+        print("ERROR: ", response.status_code)
 
 def setup():
     print("Now we will start setting up the server!")
@@ -97,15 +107,20 @@ def setup():
 
     print("\nPort forwarding:\nFor other people to join your minecraft server you need to forward port 25565 to " + get_ip() + ".")
     print("To do this you can try these links to access your router\'s settings:\n10.0.0.1\n192.168.0.1\n192.168.2.1")
-    if input("\n\nDo you want to test the server now?\n[Y/N]").lower() == "y":
+    if input("\n\nDo you want to test the server now?\n[Y/N] ").lower() == "y":
+        print("\n\nIf the server successfuly starts up the console will say \"Done\" and you can type stop then press enter in the terminal to close")
+        time.sleep(3)
         if script == "bash":
             os.system("./run.sh")
         if script == "windows":
             os.system("./run.bat")
-    if input("Did the server start?\n[Y/N] ").lower() == "n":
-        if input("Did it say something about java or JDK?\n[Y/N] ").lower() == "y":
-            print("Download the latest version of java from https://www.oracle.com/ca-en/java/technologies/downloads/ then run run.bat or run.sh")
-
+        if input("Did the server start?\n[Y/N] ").lower() == "n":
+            if input("Did it say something about java or JDK?\n[Y/N] ").lower() == "y":
+                print("Download the latest version of java from https://www.oracle.com/ca-en/java/technologies/downloads/ then run run.bat or run.sh")
+    if script == "bash":
+        print("\nTo run your server go to " + os.getcwd() + " and open \"run.sh\"\n")
+    if script == "windows":
+        print("\nTo run your server go to " + os.getcwd() + " and open \"run.bat\"\n")
 
 
 #Find the latest build of the selected minecraft version
@@ -114,4 +129,8 @@ if response.status_code == 200:
     latestBuild = data["builds"][-1]
     download()
     response = requests.get("https://api.papermc.io/v2/projects/paper/versions/" + verson)
-else: print("ERROR " + response.status_code + "\nThat version of minecraft was probably either entered wrong, doesn't exist, or is not available yet")
+else:
+    response = requests.get("https://api.papermc.io/v2/projects/paper")
+    data = response.json()
+    availableVersions = data["versions"]
+    print("List of available versions:\n" + str(availableVersions))
