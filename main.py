@@ -2,12 +2,15 @@ import os
 import sys
 import socket
 import time
-
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 savePath = ""
-
+clear()
 # Automatically install dependencies
-os.system("pip install requests")
+os.system("pip install requests\n\n\n")
 import requests
+
+
 
 
 def get_ip(): # Get the local ip
@@ -55,8 +58,7 @@ while True:
 
 # Get the save path from the user
 while True:
-    selection = int(input(
-        "Where do you want to save the minecraft server?\n1) Desktop\n2) Current directory\n3) Somewhere else\n[1/2/3] "))
+    selection = int(input("Where do you want to save the minecraft server?\n1) Desktop\n2) Current directory\n3) Somewhere else\n[1/2/3] "))
     if selection == 1:
         savePath = '~/Desktop'
     elif selection == 2:
@@ -77,9 +79,11 @@ while True:
     if response.status_code == 200:
         if os.path.exists(savePath + "/Server"):
             print("The server will be saved in " + savePath + "/Server")
+            os.chdir(savePath + "/Server/")
         else:
             if not os.path.exists(savePath):
                 os.makedirs(savePath)
+                os.chdir(savePath + "/Server/")
             os.makedirs(savePath + "/Server")
             print("The directory was created successfully and the server will be saved in " + savePath + "/Server")
             os.chdir(savePath + "/Server/")
