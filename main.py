@@ -73,20 +73,23 @@ savePath = os.path.expanduser(savePath)
 if savePath == '':
     savePath = '.'
 
+# Ask the user for server name
+name = input("What do you want to name the server?\n")
+
 # Download the minecraft version selected with the newest build of paper
 while True:
     response = requests.get("https://api.papermc.io/v2/projects/paper/versions/" + verson + "/builds/" + str(latestBuild) + "/downloads/paper-" + verson + "-" + str(latestBuild) + ".jar")
     if response.status_code == 200:
-        if os.path.exists(savePath + "/Server"):
-            print("The server will be saved in " + savePath + "/Server")
-            os.chdir(savePath + "/Server/")
+        if os.path.exists(savePath + "/" + name):
+            print("The server will be saved in " + savePath + "/" + name)
+            os.chdir(savePath + "/" + name)
         else:
             if not os.path.exists(savePath):
                 os.makedirs(savePath)
-                os.chdir(savePath + "/Server/")
-            os.makedirs(savePath + "/Server")
-            print("The directory was created successfully and the server will be saved in " + savePath + "/Server")
-            os.chdir(savePath + "/Server/")
+                os.chdir(savePath + "/" + name)
+            os.makedirs(savePath + "/" + name)
+            print("The directory was created successfully and the server will be saved in " + savePath + "/" + name)
+            os.chdir(savePath + "/" + name)
         with open("server.jar", "wb") as f:
             f.write(response.content)
             print("Minecraft server files downloaded!")
